@@ -24,4 +24,11 @@ f: rp
     | f 'and' f
     | f 'or' f
     | 'not' f
+    ;
 
+// Define tagName, fileName and attName
+tagName: [A-Za-z0-9_\-]+;
+
+fileName: [A-Za-z0-9/._]*;
+
+attName: [A-Za-z0-9/._]*;
