@@ -6,7 +6,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 /**
  * Created by fengjiang on 2/19/18.
  */
-public class MyVisitor implements XQueryVisitor{
+public class MyVisitor extends XQueryBaseVisitor{
     @Override
     public Object visitAp(XQueryParser.ApContext ctx) {
         return null;
@@ -39,21 +39,21 @@ public class MyVisitor implements XQueryVisitor{
 
     @Override
     public Object visit(ParseTree parseTree) {
-        return null;
+        return super.visit(parseTree);
     }
 
     @Override
     public Object visitChildren(RuleNode ruleNode) {
-        return null;
+        return super.visitChildren(ruleNode);
     }
 
     @Override
     public Object visitTerminal(TerminalNode terminalNode) {
-        return null;
+        return super.visitTerminal(terminalNode);
     }
 
     @Override
     public Object visitErrorNode(ErrorNode errorNode) {
-        return null;
+        return super.visitErrorNode(errorNode);
     }
 }
