@@ -103,6 +103,11 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitAp(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitAp(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final ApContext ap() throws RecognitionException {
@@ -186,6 +191,11 @@ public class XQueryParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitRp(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitRp(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -369,6 +379,11 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitF(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitF(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final FContext f() throws RecognitionException {
@@ -524,6 +539,11 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitFileName(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitFileName(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final FileNameContext fileName() throws RecognitionException {
@@ -561,6 +581,11 @@ public class XQueryParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitTagName(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitTagName(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final TagNameContext tagName() throws RecognitionException {
@@ -597,6 +622,11 @@ public class XQueryParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof XQueryListener ) ((XQueryListener)listener).exitAttName(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof XQueryVisitor ) return ((XQueryVisitor<? extends T>)visitor).visitAttName(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
