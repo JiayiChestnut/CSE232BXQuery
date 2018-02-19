@@ -10,8 +10,8 @@ grammar XQuery;
 
 // Absolute Path
 ap
-    : 'doc(' fileName ')' '/' rp
-    | 'doc(' fileName ')' '//' rp
+    : 'doc' '(' fileName ')' '/' rp
+    | 'doc' '(' fileName ')' '//' rp
     ;
 
 // Relative Path
@@ -20,7 +20,7 @@ rp
     | '*'
     | '.'
     | '..'
-    | 'text()'
+    | 'text' '(' ')'
     | '@' attName
     | '(' rp ')'
     | rp '/' rp
@@ -55,19 +55,10 @@ attName
     ;
 
 PATHSTRING
-    : LetterOrDigit+
+    : '"' [A-Za-z0-9./_]* '"'
     ;
 
 IDSTRING
-    : LetterOrDigit+
+    : [a-zA-Z0-9_-]+
     ;
     
-fragment
-Letter
-    : [a-zA-Z_]
-    ;
-
-fragment
-LetterOrDigit
-    : [a-zA-Z0-9_-]
-    ;
