@@ -9,7 +9,7 @@ public class Main
 {
     public static void main( String[] args ) throws IOException {
         ANTLRInputStream inputStream = new ANTLRInputStream(
-          "doc(\"j_caesar.xml\")//ACT[./TITLE]/*/SPEECH/../TITLE"
+          "doc(\"j_caesar.xml\")//ACT[(./TITLE)==(./TITLE)]/*/SPEECH/../TITLE"
         );
         XQueryLexer lexer = new XQueryLexer(inputStream);
         CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
@@ -24,7 +24,8 @@ public class Main
 //        System.out.println(rpContext.getParent().getChildCount());
 
         MyVisitor visitor = new MyVisitor();
-        List<Node> results = visitor.visit(apContext);
+        List<Node> results = Helper.asListNode(visitor.visit(apContext));
+        System.out.println("doc(\"j_caesar.xml\")//ACT[./TITLE]/*/SPEECH/../TITLE");
         for (Node node : results)
             System.out.println(node.getTextContent());
 

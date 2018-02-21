@@ -1,28 +1,17 @@
-<<<<<<< HEAD
 import org.antlr.v4.runtime.tree.*;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 import java.util.*;
-=======
-import org.antlr.v4.runtime.tree.ErrorNode;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.RuleNode;
-import org.antlr.v4.runtime.tree.TerminalNode;
-import org.w3c.dom.Node;
 
-import java.util.List;
->>>>>>> b6de57df8959f14fdb3ee92b84b93247cd91ad49
 
 /**
  * Created by fengjiang on 2/19/18.
  */
 public class MyVisitor extends XQueryBaseVisitor{
-<<<<<<< HEAD
+
 
     private List<Node> contextNodes;
 
-=======
->>>>>>> b6de57df8959f14fdb3ee92b84b93247cd91ad49
     @Override
     public List<Node> visitAp(XQueryParser.ApContext ctx) {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -56,7 +45,7 @@ public class MyVisitor extends XQueryBaseVisitor{
 
     // definition: [[@attName]]R(n) = attrib(n, attName)
     @Override
-    public Object visitRp_attName(XQueryParser.Rp_attNameContext ctx) {
+    public List<Node> visitRp_attName(XQueryParser.Rp_attNameContext ctx) {
 //        List<Node> next = new ArrayList<>();
 //        String attrName = ctx.getText();
 //        for (Node node : contextNodes) {
@@ -94,7 +83,55 @@ public class MyVisitor extends XQueryBaseVisitor{
 
     // definition: [[..]]R(n) = parent(n)
     @Override
-    public Object visitRp_parent(XQueryParser.Rp_parentContext ctx) {
+    public List<Node> visitRp_parent(XQueryParser.Rp_parentContext ctx) {
+        Set<Node> nextSet = new HashSet<>();
+        for (Node node : contextNodes) {
+            try {
+                nextSet.add(node.getParentNode().getParentNode());
+            } catch (Exception e) {
+                nextSet.add(node.getOwnerDocument());
+            }
+        }
+        contextNodes = new ArrayList<>(nextSet);
+        return contextNodes;
+    }
+
+    // definition: [[(rp)]]R(n) = [[rp]]R(n)
+    @Override
+    public List<Node> visitRp_rp(XQueryParser.Rp_rpContext ctx) {
+        contextNodes = Helper.asListNode(this.visit(ctx.rp()));
+        return contextNodes;
+    }
+
+    // definition: [rp1/rp2]]R(n) = unique(< y | x ← [[rp1]]R(n), y ← [[rp2]]R(x) >)
+    @Override
+    public List<Node> visitRp_nextLevel(XQueryParser.Rp_nextLevelContext ctx) {
+        List<Node> rp1 = Helper.asListNode(this.visit(ctx.rp(0)));
+        List<Node> rp1ChildNodes = getChildren(rp1);
+        contextNodes = rp1ChildNodes;
+        this.visit(ctx.rp(1));
+        return contextNodes;
+    }
+
+    // definition: [[rp1//rp2]]R(n) = unique([[rp1/rp2]]R(n), [[rp1/ ∗ //rp2]]R(n))
+    @Override
+    public List<Node> visitRp_nextLevelRecursive(XQueryParser.Rp_nextLevelRecursiveContext ctx) {
+        List<Node> rp1 = Helper.asListNode(this.visit(ctx.rp(0)));
+        List<Node> rp1ChildNodes = getChildrenRecursive(rp1);
+        contextNodes = rp1ChildNodes;
+        this.visit(ctx.rp(1));
+        return contextNodes;
+    }
+
+    // definition: [[∗]]R(n) = children(n)
+    @Override
+    public List<Node> visitRp_children(XQueryParser.Rp_childrenContext ctx) {
+        return contextNodes;
+    }
+
+    // definition: [[.]]R(n) = < n >
+    @Override
+    public List<Node> visitRp_current(XQueryParser.Rp_currentContext ctx) {
         Set<Node> nextSet = new HashSet<>();
         for (Node node : contextNodes) {
             try {
@@ -107,53 +144,9 @@ public class MyVisitor extends XQueryBaseVisitor{
         return contextNodes;
     }
 
-    // definition: [[(rp)]]R(n) = [[rp]]R(n)
-    @Override
-    public List<Node> visitRp_rp(XQueryParser.Rp_rpContext ctx) {
-        contextNodes = this.visit(ctx.rp());
-        return contextNodes;
-    }
-
-    // definition: [rp1/rp2]]R(n) = unique(< y | x ← [[rp1]]R(n), y ← [[rp2]]R(x) >)
-    @Override
-    public List<Node> visitRp_nextLevel(XQueryParser.Rp_nextLevelContext ctx) {
-        List<Node> rp1 = this.visit(ctx.rp(0));
-        List<Node> rp1ChildNodes = getChildren(rp1);
-        contextNodes = rp1ChildNodes;
-        this.visit(ctx.rp(1));
-        return contextNodes;
-    }
-
-    // definition: [[rp1//rp2]]R(n) = unique([[rp1/rp2]]R(n), [[rp1/ ∗ //rp2]]R(n))
-    @Override
-    public Object visitRp_nextLevelRecursive(XQueryParser.Rp_nextLevelRecursiveContext ctx) {
-        List<Node> rp1 = this.visit(ctx.rp(0));
-        List<Node> rp1ChildNodes = getChildrenRecursive(rp1);
-        contextNodes = rp1ChildNodes;
-        this.visit(ctx.rp(1));
-        return contextNodes;
-    }
-
-    // definition: [[∗]]R(n) = children(n)
-    @Override
-    public Object visitRp_children(XQueryParser.Rp_childrenContext ctx) {
-        contextNodes = getChildren(contextNodes);
-        return contextNodes;
-    }
-
-    // definition: [[.]]R(n) = < n >
-    @Override
-    public Object visitRp_current(XQueryParser.Rp_currentContext ctx) {
-        Set<Node> nextSet = new HashSet<>();
-        for (Node node : contextNodes)
-            nextSet.add(node);
-        contextNodes = new ArrayList<>(nextSet);
-        return contextNodes;
-    }
-
     // definition: [[text()]]R(n) = txt(n)
     @Override
-    public Object visitRp_text(XQueryParser.Rp_textContext ctx) {
+    public List<Node> visitRp_text(XQueryParser.Rp_textContext ctx) {
         List<Node> next = new ArrayList<>();
         for (Node node : contextNodes) {
             if (node.getNodeType() == Node.TEXT_NODE) {
@@ -166,18 +159,18 @@ public class MyVisitor extends XQueryBaseVisitor{
 
     // definition: [[rp1, rp2]]R(n) = [[rp1]]R(n), [[rp2]]R(n)
     @Override
-    public Object visitRp_concat(XQueryParser.Rp_concatContext ctx) {
+    public List<Node> visitRp_concat(XQueryParser.Rp_concatContext ctx) {
         // make a copy of the context nodes
         List<Node> prevContextNodes = new ArrayList<>();
         for (Node node : contextNodes)
             prevContextNodes.add(node);
 
         // get the nodes from rp1
-        List<Node> rp1 = this.visit(ctx.rp(0));
+        List<Node> rp1 = Helper.asListNode(this.visit(ctx.rp(0)));
 
         // switch to the original context nodes and get the nodes from rp2
         contextNodes = prevContextNodes;
-        List<Node> rp2 = this.visit(ctx.rp(1));
+        List<Node> rp2 = Helper.asListNode(this.visit(ctx.rp(1)));
 
         Set<Node> joinSet = new HashSet<>();
         joinSet.addAll(rp1);
@@ -186,9 +179,21 @@ public class MyVisitor extends XQueryBaseVisitor{
         return contextNodes;
     }
 
+    // definition: [[rp[f]]]R(n) = < x | x ← [[rp]]R(n), [[f]]F (x) >
     @Override
-    public Object visitRp_filter(XQueryParser.Rp_filterContext ctx) {
-        return null;
+    public List<Node> visitRp_filter(XQueryParser.Rp_filterContext ctx) {
+        List<Node> rpNodes = Helper.asListNode(this.visit(ctx.rp()));
+        List<Node> next = new ArrayList<>();
+        for (Node node : rpNodes) {
+            List<Node> newContextNodes = new ArrayList<Node>();
+            newContextNodes.add(node);
+            contextNodes = newContextNodes;
+            if (Helper.asBoolean(this.visit(ctx.f()))) {
+                next.add(node);
+            }
+        }
+        contextNodes = next;
+        return contextNodes;
     }
 
     @Override
@@ -212,7 +217,9 @@ public class MyVisitor extends XQueryBaseVisitor{
     }
 
     private Object visitF_rp(XQueryParser.FContext ctx) {
-        return ((List<Node>) this.visit(ctx.getChild(0))).size() != 0;
+        XQueryParser.RpContext rp = ctx.rp(0);
+        List<Node> rpNodes =  Helper.asListNode(this.visit(rp));
+        return rpNodes.size() != 0;
     }
 
     private Object visitF_not(XQueryParser.FContext ctx) {
@@ -269,13 +276,9 @@ public class MyVisitor extends XQueryBaseVisitor{
     }
 
     @Override
-<<<<<<< HEAD
-    public List<Node> visit(ParseTree tree) {
-        return Helper.asListNode(super.visit(tree));
-=======
-    public Object visit(ParseTree parseTree) {
-        return super.visit(parseTree);
->>>>>>> b6de57df8959f14fdb3ee92b84b93247cd91ad49
+
+    public Object visit(ParseTree tree) {
+        return super.visit(tree);
     }
 
     @Override

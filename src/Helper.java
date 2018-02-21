@@ -1,3 +1,4 @@
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.w3c.dom.Node;
 
 import java.util.*;
@@ -20,4 +21,7 @@ public class Helper {
 
     public static boolean isListNode(Object obj) { return obj instanceof List; }
     public static boolean isNode(Object obj) { return obj instanceof Node; }
+
+
+    public static Boolean asBoolean(Object obj) { return (Boolean)obj; }
 }
