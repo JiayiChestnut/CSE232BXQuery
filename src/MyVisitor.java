@@ -46,20 +46,17 @@ public class MyVisitor extends XQueryBaseVisitor{
     // definition: [[@attName]]R(n) = attrib(n, attName)
     @Override
     public List<Node> visitRp_attName(XQueryParser.Rp_attNameContext ctx) {
-//        List<Node> next = new ArrayList<>();
-//        String attrName = ctx.getText();
-//        for (Node node : contextNodes) {
-//            if (node.getNodeType() != Node.ELEMENT_NODE) {
-//                continue;
-//            }
-//            Element element = (Element) node;
-//            String attrContent = element.getAttribute(ctx.getText());
-//            Node attrElem = createElement(attrName);
-//            assert attrElem != null;
-//            attrElem.setTextContent(attrContent);
-//            next.add(attrElem);
-//        }
-//        contextNodes = next;
+        List<Node> next = new ArrayList<>();
+        String attrName = ctx.getText();
+        for (Node node : contextNodes) {
+            if (node.getNodeType() != Node.ELEMENT_NODE) {
+                continue;
+            }
+            Element element = (Element) node;
+            Attr attrNode = element.getAttributeNode(attrName);
+            next.add(attrNode);
+        }
+        contextNodes = next;
         return contextNodes;
     }
 
