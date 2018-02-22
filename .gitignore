@@ -1,2 +1,4 @@
-# Ignore workspace settings 
+# Ignore all files under out
+/out
+# Ignore workspace.xml
 .idea/workspace.xml
