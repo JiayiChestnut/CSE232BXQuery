@@ -25,7 +25,6 @@ public class Main
 
         MyVisitor visitor = new MyVisitor();
         List<Node> results = Helper.asListNode(visitor.visit(apContext));
-        System.out.println("doc(\"j_caesar.xml\")//ACT[./TITLE]/*/SPEECH/../TITLE");
         for (Node node : results)
             System.out.println(node.getTextContent());
 
