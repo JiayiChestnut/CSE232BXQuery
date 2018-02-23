@@ -25,12 +25,19 @@ public class MyVisitor extends XQueryBaseVisitor{
 
     @Override
     public Object visitXq_makeElement(XQueryParser.Xq_makeElementContext ctx) {
-        if (this.doc == null)
+        String tagName = ctx.tagName(0).getText();
+        if (!tagName.equals(ctx.tagName(1).getText().replace("/", ""))) {
+            throw new RuntimeException("Invalid tag name");
+        }
+        if (this.doc == null) {
             initDoc();
+        }
+        List<Node> res = Helper.asListNode(this.visit(ctx.xq()));
         Node node = this.doc.createElement(ctx.tagName(0).getText());
-        List<Node> res = (List<Node>) this.visit(ctx.xq());
+
         for (Node n: res) {
-            node.appendChild(this.doc.importNode(n, true));
+            Node tempNode = this.doc.importNode(n, true);
+            node.appendChild(tempNode);
         }
         res.clear();
         res.add(node);
@@ -50,14 +57,7 @@ public class MyVisitor extends XQueryBaseVisitor{
         return new ArrayList<>(res);
     }
 
-    @Override
-    public Object visitXq_loop(XQueryParser.Xq_loopContext ctx) {
-        Map<String, Object> oldVars = new HashMap<>(this.vars);
-        List<Node> res = new ArrayList<>();
-        this.visitFor(res, ctx, 0);
-        this.vars = oldVars;
-        return res;
-    }
+
 
     @Override
     public Object visitXq_ap(XQueryParser.Xq_apContext ctx) {
@@ -101,7 +101,7 @@ public class MyVisitor extends XQueryBaseVisitor{
         List<Node> res = new ArrayList<>();
         if (this.doc == null)
             initDoc();
-        res.add(this.doc.createTextNode(ctx.getText()));
+        res.add(this.doc.createTextNode(ctx.getText().replace("\"", "")));
         return res;
     }
 
@@ -109,6 +109,15 @@ public class MyVisitor extends XQueryBaseVisitor{
     @Override
     public Object visitForClause(XQueryParser.ForClauseContext ctx) {
         return super.visitForClause(ctx);
+    }
+
+    @Override
+    public Object visitXq_loop(XQueryParser.Xq_loopContext ctx) {
+        Map<String, Object> oldVars = new HashMap<>(this.vars);
+        List<Node> res = new ArrayList<>();
+        this.visitFor(res, ctx, 0);
+        this.vars = oldVars;
+        return res;
     }
 
     private void visitFor(List<Node> res, XQueryParser.Xq_loopContext ctx, int idx) {
@@ -207,7 +216,7 @@ public class MyVisitor extends XQueryBaseVisitor{
     // definition: [[not Cond1]]C (C) = ¬[[Cond1]]C (C)
     @Override
     public Object visitCond_not(XQueryParser.Cond_notContext ctx) {
-        return !(boolean)this.visit(ctx.cond());
+        return !((boolean)this.visit(ctx.cond()));
     }
 
     // definition: [[Cond1 or Cond2]]C (C) = [[Cond1]]C (C) ∨ [[Cond2]]C (C)

@@ -9,12 +9,9 @@ public class Main
 {
     public static void main( String[] args ) throws IOException {
         ANTLRInputStream inputStream = new ANTLRInputStream(
-          "<result>{\n" +
-                  "for $a in doc(\"j_caesar.xml\")//PERSONAE, $b in $a/PERSONA \n" +
-                  "  where ($b/text() = \"JULIUS CAESAR\") or ($b/text() = \"Another Poet\")\n" +
-                  "   return $b\n" +
-                  "}\n" +
-                  "</result>"
+"for $a in doc(\"j_caesar.xml\")//PERSONAE, $b in $a/PERSONA \n" +
+        "where not (($b/text() = \"JULIUS CAESAR\") or ($b/text() = \"Another Poet\") )\n" +
+        "return $b"
         );
         XQueryLexer lexer = new XQueryLexer(inputStream);
         CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
@@ -30,8 +27,8 @@ public class Main
 
         MyVisitor visitor = new MyVisitor();
         List<Node> results = Helper.asListNode(visitor.visit(qContext));
-        for (Node node : results)
-            System.out.println(node.getTextContent());
+        for (Node res : results)
+            System.out.println(res.getTextContent());
 
     }
 
