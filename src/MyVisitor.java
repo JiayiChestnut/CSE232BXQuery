@@ -9,7 +9,7 @@ import java.util.*;
  */
 public class MyVisitor extends XQueryBaseVisitor{
 
-    private List<Node> contextNodes;
+    private List<Node> contextNodes = new ArrayList<>();
     private Map<String, Object> vars = new HashMap<>();
     private Document doc;
 
@@ -37,9 +37,15 @@ public class MyVisitor extends XQueryBaseVisitor{
 
     @Override
     public Object visitXq_concat(XQueryParser.Xq_concatContext ctx) {
+        List<Node> prevContextNodes = new ArrayList<>();
+        prevContextNodes.addAll(contextNodes);
         List<Node> l1 = (List<Node>) this.visit(ctx.xq(0));
+        contextNodes = prevContextNodes;
         List<Node> l2 = (List<Node>) this.visit(ctx.xq(1));
-        return l1.addAll(l2);
+        Set<Node> res = new HashSet<>();
+        res.addAll(l1);
+        res.addAll(l2);
+        return new ArrayList<>(res);
     }
 
     // TODO: finish implementation.
@@ -121,52 +127,77 @@ public class MyVisitor extends XQueryBaseVisitor{
         return this.visit(ctx.xq());
     }
 
-    // TODO:
+    // definition: [[Cond1 and Cond2]]C (C) = [[Cond1]]C (C) ∧ [[Cond2]]C (C)
     @Override
     public Object visitCond_and(XQueryParser.Cond_andContext ctx) {
-        return super.visitCond_and(ctx);
+        // make a copy of the context nodes
+        List<Node> prevContextNodes = new ArrayList<>();
+        prevContextNodes.addAll(contextNodes);
+        boolean leftCond = (boolean)this.visit(ctx.cond(0));
+        contextNodes = prevContextNodes;
+        boolean rightCond = (boolean)this.visit(ctx.cond(1));
+        return leftCond && rightCond;
     }
 
-    // TODO:
+    // definition: [[empty(XQ1)]]C (C) = [[XQ1]]X(C) =<>
     @Override
     public Object visitCond_empty(XQueryParser.Cond_emptyContext ctx) {
-        return super.visitCond_empty(ctx);
+        Object result = this.visit(ctx.xq());
+        return Helper.isListNode(result) && ((List<Node>)result).size() == 0;
     }
 
-    // TODO:
+    // definition: [[rp1 = rp2]]F (n) = [[rp1 eq rp2]]F (n) = ∃x ∈ [[rp1]]R(n) ∃y ∈ [[rp2]]R(n) x eq y
     @Override
     public Object visitCond_equal(XQueryParser.Cond_equalContext ctx) {
-        return super.visitCond_equal(ctx);
+        // make a copy of the context nodes
+        List<Node> prevContextNodes = new ArrayList<>();
+        prevContextNodes.addAll(contextNodes);
+        List<Node> leftXq = Helper.asListNode(this.visit(ctx.xq(0)));
+        contextNodes = prevContextNodes;
+        List<Node> rightXq = Helper.asListNode(this.visit(ctx.xq(1)));
+        return checkEq(leftXq, rightXq);
     }
 
-    // TODO:
+    // definition: [[XQ1 is XQ2]]C (C) = [[XQ1 == XQ2]]C (C) = ∃x ∈ [[XQ1]]X(C) ∃y ∈ [[XQ2]]X(C) x is y
     @Override
     public Object visitCond_is(XQueryParser.Cond_isContext ctx) {
-        return super.visitCond_is(ctx);
+        // make a copy of the context nodes
+        List<Node> prevContextNodes = new ArrayList<>();
+        prevContextNodes.addAll(contextNodes);
+        List<Node> leftXq = Helper.asListNode(this.visit(ctx.xq(0)));
+        contextNodes = prevContextNodes;
+        List<Node> rightXq = Helper.asListNode(this.visit(ctx.xq(1)));
+        return checkIs(leftXq, rightXq);
     }
 
-    // TODO:
+    // definition: [[(Cond1)]]C (C) = [[Cond1]]C (C)
     @Override
     public Object visitCond_cond(XQueryParser.Cond_condContext ctx) {
-        return super.visitCond_cond(ctx);
+        return this.visit(ctx.cond());
     }
 
-    // TODO:
+    // definition:
     @Override
     public Object visitCond_some(XQueryParser.Cond_someContext ctx) {
-        return super.visitCond_some(ctx);
+        return true;
     }
 
-    // TODO:
+    // definition: [[not Cond1]]C (C) = ¬[[Cond1]]C (C)
     @Override
     public Object visitCond_not(XQueryParser.Cond_notContext ctx) {
-        return super.visitCond_not(ctx);
+        return !(boolean)this.visit(ctx.cond());
     }
 
-    // TODO:
+    // definition: [[Cond1 or Cond2]]C (C) = [[Cond1]]C (C) ∨ [[Cond2]]C (C)
     @Override
     public Object visitCond_or(XQueryParser.Cond_orContext ctx) {
-        return super.visitCond_or(ctx);
+        // make a copy of the context nodes
+        List<Node> prevContextNodes = new ArrayList<>();
+        prevContextNodes.addAll(contextNodes);
+        boolean leftCond = (boolean)this.visit(ctx.cond(0));
+        contextNodes = prevContextNodes;
+        boolean rightCond = (boolean)this.visit(ctx.cond(1));
+        return leftCond || rightCond;
     }
 
     @Override
@@ -490,7 +521,7 @@ public class MyVisitor extends XQueryBaseVisitor{
     private boolean checkIs(List<Node> l1, List<Node> l2) {
         for (Node n1: l1)
             for (Node n2: l2) {
-                if (n1 == n2)
+                if (n1.isSameNode(n2))
                     return true;
             }
         return false;

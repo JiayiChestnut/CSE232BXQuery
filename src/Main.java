@@ -9,24 +9,25 @@ public class Main
 {
     public static void main( String[] args ) throws IOException {
         ANTLRInputStream inputStream = new ANTLRInputStream(
-          "doc(\"j_caesar.xml\")//ACT[(./TITLE)==(./TITLE)]/*/SPEECH/../TITLE"
+          "empty(doc(\"j_caesar.xml\")//KLBJLHB, doc(\"j_caesar.xml\")//KLBJLHB)"
         );
         XQueryLexer lexer = new XQueryLexer(inputStream);
         CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
         XQueryParser parser = new XQueryParser(commonTokenStream);
-        XQueryParser.ApContext apContext = parser.ap();
+        XQueryParser.CondContext cContext = parser.cond();
 
 
-//        System.out.println(inputStream);
+        System.out.println(inputStream);
 //        System.out.println(apContext.fileName().getText());
 //        XQueryParser.RpContext rpContext = apContext.rp();
 //        System.out.println(rpContext.getText());
 //        System.out.println(rpContext.getParent().getChildCount());
 
         MyVisitor visitor = new MyVisitor();
-        List<Node> results = Helper.asListNode(visitor.visit(apContext));
-        for (Node node : results)
-            System.out.println(node.getTextContent());
+        System.out.println((boolean)visitor.visit(cContext));
+//        List<Node> results = Helper.asListNode(visitor.visit(cContext));
+//        for (Node node : results)
+//            System.out.println(node.getTextContent());
 
     }
 
