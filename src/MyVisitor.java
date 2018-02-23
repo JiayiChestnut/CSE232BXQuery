@@ -25,6 +25,8 @@ public class MyVisitor extends XQueryBaseVisitor{
 
     @Override
     public Object visitXq_makeElement(XQueryParser.Xq_makeElementContext ctx) {
+        if (this.doc == null)
+            initDoc();
         Node node = this.doc.createElement(ctx.tagName(0).getText());
         List<Node> res = (List<Node>) this.visit(ctx.xq());
         for (Node n: res) {
@@ -64,7 +66,8 @@ public class MyVisitor extends XQueryBaseVisitor{
 
     @Override
     public Object visitXq_nextLevelRecursive(XQueryParser.Xq_nextLevelRecursiveContext ctx) {
-        return getChildrenRecursive((List<Node>) this.visit(ctx.xq()));
+        contextNodes = getChildrenRecursive(Helper.asListNode(this.visit(ctx.xq())));
+        return this.visit(ctx.rp());
     }
 
     @Override
@@ -84,7 +87,8 @@ public class MyVisitor extends XQueryBaseVisitor{
 
     @Override
     public Object visitXq_nextLevel(XQueryParser.Xq_nextLevelContext ctx) {
-        return getChildren((List<Node>) this.visit(ctx.xq()));
+        contextNodes = getChildren(Helper.asListNode(this.visit(ctx.xq())));
+        return this.visit(ctx.rp());
     }
 
     @Override
@@ -95,6 +99,8 @@ public class MyVisitor extends XQueryBaseVisitor{
     @Override
     public Object visitStrConstant(XQueryParser.StrConstantContext ctx) {
         List<Node> res = new ArrayList<>();
+        if (this.doc == null)
+            initDoc();
         res.add(this.doc.createTextNode(ctx.getText()));
         return res;
     }
@@ -512,7 +518,7 @@ public class MyVisitor extends XQueryBaseVisitor{
             NodeList nodeList;
             if (node.getNodeType() == Node.DOCUMENT_NODE) {
                 nodeList = ((Document) node).getElementsByTagName("*");
-            } else {
+            } else{
                 nodeList = ((Element) node).getElementsByTagName("*");
             }
             for (int i = 0; i < nodeList.getLength(); i++) {
@@ -541,5 +547,15 @@ public class MyVisitor extends XQueryBaseVisitor{
                     return true;
             }
         return false;
+    }
+
+    private void initDoc() {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        try {
+            this.doc = dbf.newDocumentBuilder().newDocument();
+        } catch (ParserConfigurationException ex) {
+            return;
+        }
+
     }
 }

@@ -9,12 +9,17 @@ public class Main
 {
     public static void main( String[] args ) throws IOException {
         ANTLRInputStream inputStream = new ANTLRInputStream(
-          "empty(doc(\"j_caesar.xml\")//KLBJLHB, doc(\"j_caesar.xml\")//KLBJLHB)"
+          "<result>{\n" +
+                  "for $a in doc(\"j_caesar.xml\")//PERSONAE, $b in $a/PERSONA \n" +
+                  "  where ($b/text() = \"JULIUS CAESAR\") or ($b/text() = \"Another Poet\")\n" +
+                  "   return $b\n" +
+                  "}\n" +
+                  "</result>"
         );
         XQueryLexer lexer = new XQueryLexer(inputStream);
         CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
         XQueryParser parser = new XQueryParser(commonTokenStream);
-        XQueryParser.CondContext cContext = parser.cond();
+        XQueryParser.QueryContext qContext = parser.query();
 
 
         System.out.println(inputStream);
@@ -24,10 +29,9 @@ public class Main
 //        System.out.println(rpContext.getParent().getChildCount());
 
         MyVisitor visitor = new MyVisitor();
-        System.out.println((boolean)visitor.visit(cContext));
-//        List<Node> results = Helper.asListNode(visitor.visit(cContext));
-//        for (Node node : results)
-//            System.out.println(node.getTextContent());
+        List<Node> results = Helper.asListNode(visitor.visit(qContext));
+        for (Node node : results)
+            System.out.println(node.getTextContent());
 
     }
 
