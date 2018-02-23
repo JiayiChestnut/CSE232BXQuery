@@ -88,21 +88,25 @@ public class MyVisitor extends XQueryBaseVisitor{
         return getChildren((List<Node>) this.visit(ctx.xq()));
     }
 
+    // TODO:
     @Override
     public Object visitVar(XQueryParser.VarContext ctx) {
         return super.visitVar(ctx);
     }
 
+    // TODO:
     @Override
     public Object visitStrConstant(XQueryParser.StrConstantContext ctx) {
         return super.visitStrConstant(ctx);
     }
 
+    // TODO:
     @Override
     public Object visitForClause(XQueryParser.ForClauseContext ctx) {
         return super.visitForClause(ctx);
     }
 
+    // TODO:
     @Override
     public Object visitLetClause(XQueryParser.LetClauseContext ctx) {
         return super.visitLetClause(ctx);
@@ -118,41 +122,49 @@ public class MyVisitor extends XQueryBaseVisitor{
         return this.visit(ctx.xq());
     }
 
+    // TODO:
     @Override
     public Object visitCond_and(XQueryParser.Cond_andContext ctx) {
         return super.visitCond_and(ctx);
     }
 
+    // TODO:
     @Override
     public Object visitCond_empty(XQueryParser.Cond_emptyContext ctx) {
         return super.visitCond_empty(ctx);
     }
 
+    // TODO:
     @Override
     public Object visitCond_equal(XQueryParser.Cond_equalContext ctx) {
         return super.visitCond_equal(ctx);
     }
 
+    // TODO:
     @Override
     public Object visitCond_is(XQueryParser.Cond_isContext ctx) {
         return super.visitCond_is(ctx);
     }
 
+    // TODO:
     @Override
     public Object visitCond_cond(XQueryParser.Cond_condContext ctx) {
         return super.visitCond_cond(ctx);
     }
 
+    // TODO:
     @Override
     public Object visitCond_some(XQueryParser.Cond_someContext ctx) {
         return super.visitCond_some(ctx);
     }
 
+    // TODO:
     @Override
     public Object visitCond_not(XQueryParser.Cond_notContext ctx) {
         return super.visitCond_not(ctx);
     }
 
+    // TODO:
     @Override
     public Object visitCond_or(XQueryParser.Cond_orContext ctx) {
         return super.visitCond_or(ctx);
