@@ -48,18 +48,13 @@ public class MyVisitor extends XQueryBaseVisitor{
         return new ArrayList<>(res);
     }
 
-    // TODO: finish implementation.
     @Override
     public Object visitXq_loop(XQueryParser.Xq_loopContext ctx) {
         Map<String, Object> oldVars = new HashMap<>(this.vars);
-        this.visit(ctx.forClause());
-        if (ctx.letClause() != null)
-            this.visit(ctx.letClause());
-        if (ctx.whereClause() != null)
-            this.visit(ctx.whereClause());
-        this.visit(ctx.returnClause());
+        List<Node> res = new ArrayList<>();
+        this.visitFor(res, ctx, 0);
         this.vars = oldVars;
-        return null;
+        return res;
     }
 
     @Override
@@ -74,14 +69,12 @@ public class MyVisitor extends XQueryBaseVisitor{
 
     @Override
     public Object visitXq_var(XQueryParser.Xq_varContext ctx) {
-        return this.vars.get(ctx.getText());
+        return this.visit(ctx.var());
     }
 
     @Override
     public Object visitXq_makeText(XQueryParser.Xq_makeTextContext ctx) {
-        List<Node> res = new ArrayList<>();
-        res.add(this.doc.createTextNode(ctx.getText()));
-        return res;
+        return this.visit(ctx.strConstant());
     }
 
     @Override
@@ -99,22 +92,45 @@ public class MyVisitor extends XQueryBaseVisitor{
         return this.vars.get(ctx.getText());
     }
 
-    // TODO:
     @Override
     public Object visitStrConstant(XQueryParser.StrConstantContext ctx) {
-        return super.visitStrConstant(ctx);
+        List<Node> res = new ArrayList<>();
+        res.add(this.doc.createTextNode(ctx.getText()));
+        return res;
     }
 
-    // TODO:
+    //TODO:
     @Override
     public Object visitForClause(XQueryParser.ForClauseContext ctx) {
         return super.visitForClause(ctx);
     }
 
-    // TODO:
+    private void visitFor(List<Node> res, XQueryParser.Xq_loopContext ctx, int idx) {
+        if (idx >= ctx.forClause().var().size()) {
+            if (ctx.letClause() != null)
+                this.visit(ctx.letClause());
+            if (ctx.whereClause() != null)
+                if (!((boolean) this.visit(ctx.whereClause())))
+                    return;
+            List<Node> temp = (List<Node>) this.visit(ctx.returnClause());
+            res.addAll(temp);
+            return;
+        }
+        String key = ctx.forClause().var(idx).getText();
+        List<Node> values = (List<Node>) this.visit(ctx.forClause().xq(idx));
+        for (Node node: values) {
+            List<Node> temp = new ArrayList<>();
+            temp.add(node);
+            this.vars.put(key, temp);
+            visitFor(res, ctx, idx+1);
+        }
+    }
+
     @Override
     public Object visitLetClause(XQueryParser.LetClauseContext ctx) {
-        return super.visitLetClause(ctx);
+        for (int i = 0; i < ctx.var().size(); ++i)
+            this.vars.put(ctx.var(i).getText(), this.visit(ctx.xq(i)));
+        return null;
     }
 
     @Override
