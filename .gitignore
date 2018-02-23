@@ -2,3 +2,7 @@
 /out
 # Ignore workspace.xml
 .idea/workspace.xml
+# Ignore irrelevant src files
+/src/*.class
+/src/XQuery.interp
+src/XQueryParser.java

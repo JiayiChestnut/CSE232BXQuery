@@ -207,10 +207,32 @@ public class MyVisitor extends XQueryBaseVisitor{
         return this.visit(ctx.cond());
     }
 
+
     // definition:
     @Override
     public Object visitCond_some(XQueryParser.Cond_someContext ctx) {
-        return true;
+        Map<String, Object> oldVars = new HashMap<>(this.vars);
+        List<Node> nodes = new ArrayList<>();
+        boolean res = this.visitSome(ctx, 0);
+        this.vars = oldVars;
+        return res;
+    }
+
+    private boolean visitSome(XQueryParser.Cond_someContext ctx, int idx) {
+        if (idx >= ctx.xq().size()) {
+            return (boolean) this.visit(ctx.cond());
+        }
+        String var = ctx.var(idx).getText();
+        List<Node> nodes = (List<Node>) this.visit(ctx.xq(idx));
+        for (Node node: nodes) {
+            List<Node> temp = new ArrayList<>();
+            temp.add(node);
+            this.vars.put(var, temp);
+            boolean res = visitSome(ctx, idx+1);
+            if (res)
+                return true;
+        }
+        return false;
     }
 
     // definition: [[not Cond1]]C (C) = ¬[[Cond1]]C (C)

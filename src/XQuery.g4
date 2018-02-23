@@ -42,7 +42,7 @@ cond
     : xq op=('='|'eq') xq                               #cond_equal
     | xq op=('=='|'is') xq                              #cond_is
     | 'empty' '(' xq ')'                                    #cond_empty
-    | 'some' var 'in' xq (',' var 'in' xq)* 'satisfies' cond    #cond_some
+    | 'some' (var 'in' xq ',')* var 'in' xq 'satisfies' cond    #cond_some
     | '(' cond ')'                                          #cond_cond
     | cond 'and' cond                                       #cond_and
     | cond 'or' cond                                        #cond_or
