@@ -9,14 +9,160 @@ import java.util.*;
  */
 public class MyVisitor extends XQueryBaseVisitor{
 
-
     private List<Node> contextNodes;
+    private Map<String, Object> vars = new HashMap<>();
+    private Document doc;
+
+    @Override
+    public Object visitQuery(XQueryParser.QueryContext ctx) {
+        return this.visit(ctx.xq());
+    }
+
+    @Override
+    public Object visitXq_xq(XQueryParser.Xq_xqContext ctx) {
+        return this.visit(ctx.xq());
+    }
+
+    @Override
+    public Object visitXq_makeElement(XQueryParser.Xq_makeElementContext ctx) {
+        Node node = this.doc.createElement(ctx.tagName(0).getText());
+        List<Node> res = (List<Node>) this.visit(ctx.xq());
+        for (Node n: res) {
+            node.appendChild(this.doc.importNode(n, true));
+        }
+        res.clear();
+        res.add(node);
+        return res;
+    }
+
+    @Override
+    public Object visitXq_concat(XQueryParser.Xq_concatContext ctx) {
+        List<Node> l1 = (List<Node>) this.visit(ctx.xq(0));
+        List<Node> l2 = (List<Node>) this.visit(ctx.xq(1));
+        return l1.addAll(l2);
+    }
+
+    // TODO: finish implementation.
+    @Override
+    public Object visitXq_loop(XQueryParser.Xq_loopContext ctx) {
+        Map<String, Object> oldVars = new HashMap<>(this.vars);
+        this.visit(ctx.forClause());
+        if (ctx.letClause() != null)
+            this.visit(ctx.letClause());
+        if (ctx.whereClause() != null)
+            this.visit(ctx.whereClause());
+        this.visit(ctx.returnClause());
+        this.vars = oldVars;
+        return null;
+    }
+
+    @Override
+    public Object visitXq_ap(XQueryParser.Xq_apContext ctx) {
+        return this.visit(ctx.ap());
+    }
+
+    @Override
+    public Object visitXq_nextLevelRecursive(XQueryParser.Xq_nextLevelRecursiveContext ctx) {
+        return getChildrenRecursive((List<Node>) this.visit(ctx.xq()));
+    }
+
+    @Override
+    public Object visitXq_var(XQueryParser.Xq_varContext ctx) {
+        return this.vars.get(ctx.getText());
+    }
+
+    @Override
+    public Object visitXq_makeText(XQueryParser.Xq_makeTextContext ctx) {
+        List<Node> res = new ArrayList<>();
+        res.add(this.doc.createTextNode(ctx.getText()));
+        return res;
+    }
+
+    @Override
+    public Object visitXq_let(XQueryParser.Xq_letContext ctx) {
+        return this.visit(ctx.letClause());
+    }
+
+    @Override
+    public Object visitXq_nextLevel(XQueryParser.Xq_nextLevelContext ctx) {
+        return getChildren((List<Node>) this.visit(ctx.xq()));
+    }
+
+    @Override
+    public Object visitVar(XQueryParser.VarContext ctx) {
+        return super.visitVar(ctx);
+    }
+
+    @Override
+    public Object visitStrConstant(XQueryParser.StrConstantContext ctx) {
+        return super.visitStrConstant(ctx);
+    }
+
+    @Override
+    public Object visitForClause(XQueryParser.ForClauseContext ctx) {
+        return super.visitForClause(ctx);
+    }
+
+    @Override
+    public Object visitLetClause(XQueryParser.LetClauseContext ctx) {
+        return super.visitLetClause(ctx);
+    }
+
+    @Override
+    public Object visitWhereClause(XQueryParser.WhereClauseContext ctx) {
+        return this.visit(ctx.cond());
+    }
+
+    @Override
+    public Object visitReturnClause(XQueryParser.ReturnClauseContext ctx) {
+        return this.visit(ctx.xq());
+    }
+
+    @Override
+    public Object visitCond_and(XQueryParser.Cond_andContext ctx) {
+        return super.visitCond_and(ctx);
+    }
+
+    @Override
+    public Object visitCond_empty(XQueryParser.Cond_emptyContext ctx) {
+        return super.visitCond_empty(ctx);
+    }
+
+    @Override
+    public Object visitCond_equal(XQueryParser.Cond_equalContext ctx) {
+        return super.visitCond_equal(ctx);
+    }
+
+    @Override
+    public Object visitCond_is(XQueryParser.Cond_isContext ctx) {
+        return super.visitCond_is(ctx);
+    }
+
+    @Override
+    public Object visitCond_cond(XQueryParser.Cond_condContext ctx) {
+        return super.visitCond_cond(ctx);
+    }
+
+    @Override
+    public Object visitCond_some(XQueryParser.Cond_someContext ctx) {
+        return super.visitCond_some(ctx);
+    }
+
+    @Override
+    public Object visitCond_not(XQueryParser.Cond_notContext ctx) {
+        return super.visitCond_not(ctx);
+    }
+
+    @Override
+    public Object visitCond_or(XQueryParser.Cond_orContext ctx) {
+        return super.visitCond_or(ctx);
+    }
 
     @Override
     public List<Node> visitAp(XQueryParser.ApContext ctx) {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         String fileName = ctx.fileName().getText().replace('\"', ' ').trim();
-        List<Node> childNodes = new ArrayList<>();
+        List<Node> childNodes;
         try {
             //Using factory get an instance of document builder
             DocumentBuilder db = dbf.newDocumentBuilder();
@@ -24,8 +170,8 @@ public class MyVisitor extends XQueryBaseVisitor{
             //parse using builder to get DOM representation of the XML file
             List<Node> prev = new ArrayList<>();
 
-            Document doc = db.parse(fileName);
-            prev.add(doc);
+            this.doc = db.parse(fileName);
+            prev.add(this.doc);
 
             //Visit children
             if (ctx.getChild(5).getText().equals("/")) {
@@ -159,8 +305,7 @@ public class MyVisitor extends XQueryBaseVisitor{
     public List<Node> visitRp_concat(XQueryParser.Rp_concatContext ctx) {
         // make a copy of the context nodes
         List<Node> prevContextNodes = new ArrayList<>();
-        for (Node node : contextNodes)
-            prevContextNodes.add(node);
+        prevContextNodes.addAll(contextNodes);
 
         // get the nodes from rp1
         List<Node> rp1 = Helper.asListNode(this.visit(ctx.rp(0)));
@@ -331,4 +476,5 @@ public class MyVisitor extends XQueryBaseVisitor{
         }
         return new ArrayList<>(set4next);
     }
+
 }

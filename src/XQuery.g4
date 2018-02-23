@@ -22,7 +22,7 @@ query: xq EOF?;
 xq
     : var                                               #xq_var
     | '<' tagName '>' '{' xq '}' '<' '/' tagName '>'    #xq_makeElement
-    | strConstant                                      #xq_makeText
+    | strConstant                                       #xq_makeText
     | ap                                                #xq_ap
     | '(' xq ')'                                        #xq_xq
     | xq ',' xq                                         #xq_concat
