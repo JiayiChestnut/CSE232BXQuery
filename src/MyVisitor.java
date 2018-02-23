@@ -371,23 +371,13 @@ public class MyVisitor extends XQueryBaseVisitor{
     private Object visitF_eq(XQueryParser.FContext ctx) {
         List<Node> l1 = (List<Node>) this.visit(ctx.getChild(0));
         List<Node> l2 = (List<Node>) this.visit(ctx.getChild(2));
-        for (Node n1: l1)
-            for (Node n2: l2) {
-                if (n1.isEqualNode(n2))
-                    return true;
-            }
-        return false;
+        return checkEq(l1, l2);
     }
 
     private Object visitF_is(XQueryParser.FContext ctx) {
         List<Node> l1 = (List<Node>) this.visit(ctx.getChild(0));
         List<Node> l2 = (List<Node>) this.visit(ctx.getChild(2));
-        for (Node n1: l1)
-            for (Node n2: l2) {
-                if (n1 == n2)
-                    return true;
-            }
-        return false;
+        return checkIs(l1, l2);
     }
 
     private Object visitF_f(XQueryParser.FContext ctx) {
@@ -477,4 +467,21 @@ public class MyVisitor extends XQueryBaseVisitor{
         return new ArrayList<>(set4next);
     }
 
+    private boolean checkEq(List<Node> l1, List<Node> l2) {
+        for (Node n1: l1)
+            for (Node n2: l2) {
+                if (n1.isEqualNode(n2))
+                    return true;
+            }
+        return false;
+    }
+
+    private boolean checkIs(List<Node> l1, List<Node> l2) {
+        for (Node n1: l1)
+            for (Node n2: l2) {
+                if (n1 == n2)
+                    return true;
+            }
+        return false;
+    }
 }
