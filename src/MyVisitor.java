@@ -88,10 +88,9 @@ public class MyVisitor extends XQueryBaseVisitor{
         return getChildren((List<Node>) this.visit(ctx.xq()));
     }
 
-    // TODO:
     @Override
     public Object visitVar(XQueryParser.VarContext ctx) {
-        return super.visitVar(ctx);
+        return this.vars.get(ctx.getText());
     }
 
     // TODO:
