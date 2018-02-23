@@ -18,7 +18,7 @@ public class Main
         XQueryLexer lexer = new XQueryLexer(streamIn);
         CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
         XQueryParser parser = new XQueryParser(commonTokenStream);
-        XQueryParser.CondContext qContext = parser.cond();
+        XQueryParser.QueryContext qContext = parser.query();
 
 
         System.out.println(streamIn);
