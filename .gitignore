@@ -6,3 +6,6 @@
 /src/*.class
 /src/XQuery.interp
 src/XQueryParser.java
+# Ignore input and output files
+results.xml
+xquery.txt
