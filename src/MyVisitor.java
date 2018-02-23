@@ -33,15 +33,14 @@ public class MyVisitor extends XQueryBaseVisitor{
             initDoc();
         }
         List<Node> res = Helper.asListNode(this.visit(ctx.xq()));
+        List<Node> tempRes = new ArrayList<>();
         Node node = this.doc.createElement(ctx.tagName(0).getText());
-
         for (Node n: res) {
             Node tempNode = this.doc.importNode(n, true);
             node.appendChild(tempNode);
         }
-        res.clear();
-        res.add(node);
-        return res;
+        tempRes.add(node);
+        return tempRes;
     }
 
     @Override
