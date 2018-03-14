@@ -21,7 +21,8 @@ query: xq EOF?;
 
 xq
     : var                                               #xq_var
-    | '<' tagName '>' '{' xq '}' '<' '/' tagName '>'    #xq_makeElement
+    | multiTagClause                                    #xq_makeMultiElement
+    | tagClause                                         #xq_makeElement
     | strConstant                                       #xq_makeText
     | ap                                                #xq_ap
     | '(' xq ')'                                        #xq_xq
@@ -30,14 +31,18 @@ xq
     | xq '/' '/' rp                                     #xq_nextLevelRecursive
     | forClause letClause? whereClause? returnClause    #xq_loop
     | letClause xq                                      #xq_let
+    | joinClause                                        #xq_join
     ;
-
+multiTagClause: '<' tagName '>' '{'? tagClause+ '}'? '<' '/' tagName '>';
+tagClause: '<' tagName '>' '{' xq '}' '<' '/' tagName '>';
 var : '$' IDSTRING;
 strConstant: STRING | PATHSTRING;
 forClause: 'for' var 'in' xq (',' var 'in' xq)*;
 letClause: 'let' var ':=' xq (',' var ':=' xq)*;
 whereClause: 'where' cond;
 returnClause: 'return' xq;
+joinClause:  'join' '(' xq ',' xq ',' listOfConst ',' listOfConst')' ;
+listOfConst:  '[' (IDSTRING ',')* IDSTRING ']';
 cond
     : xq op=('='|'eq') xq                               #cond_equal
     | xq op=('=='|'is') xq                              #cond_is

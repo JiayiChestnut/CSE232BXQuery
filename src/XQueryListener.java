@@ -101,6 +101,30 @@ public interface XQueryListener extends ParseTreeListener {
 	 */
 	void exitXq_var(XQueryParser.Xq_varContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code xq_join}
+	 * labeled alternative in {@link XQueryParser#xq}.
+	 * @param ctx the parse tree
+	 */
+	void enterXq_join(XQueryParser.Xq_joinContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code xq_join}
+	 * labeled alternative in {@link XQueryParser#xq}.
+	 * @param ctx the parse tree
+	 */
+	void exitXq_join(XQueryParser.Xq_joinContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code xq_makeMultiElement}
+	 * labeled alternative in {@link XQueryParser#xq}.
+	 * @param ctx the parse tree
+	 */
+	void enterXq_makeMultiElement(XQueryParser.Xq_makeMultiElementContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code xq_makeMultiElement}
+	 * labeled alternative in {@link XQueryParser#xq}.
+	 * @param ctx the parse tree
+	 */
+	void exitXq_makeMultiElement(XQueryParser.Xq_makeMultiElementContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code xq_makeText}
 	 * labeled alternative in {@link XQueryParser#xq}.
 	 * @param ctx the parse tree
@@ -136,6 +160,26 @@ public interface XQueryListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitXq_nextLevel(XQueryParser.Xq_nextLevelContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link XQueryParser#multiTagClause}.
+	 * @param ctx the parse tree
+	 */
+	void enterMultiTagClause(XQueryParser.MultiTagClauseContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XQueryParser#multiTagClause}.
+	 * @param ctx the parse tree
+	 */
+	void exitMultiTagClause(XQueryParser.MultiTagClauseContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link XQueryParser#tagClause}.
+	 * @param ctx the parse tree
+	 */
+	void enterTagClause(XQueryParser.TagClauseContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XQueryParser#tagClause}.
+	 * @param ctx the parse tree
+	 */
+	void exitTagClause(XQueryParser.TagClauseContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link XQueryParser#var}.
 	 * @param ctx the parse tree
@@ -196,6 +240,26 @@ public interface XQueryListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitReturnClause(XQueryParser.ReturnClauseContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link XQueryParser#joinClause}.
+	 * @param ctx the parse tree
+	 */
+	void enterJoinClause(XQueryParser.JoinClauseContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XQueryParser#joinClause}.
+	 * @param ctx the parse tree
+	 */
+	void exitJoinClause(XQueryParser.JoinClauseContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link XQueryParser#listOfConst}.
+	 * @param ctx the parse tree
+	 */
+	void enterListOfConst(XQueryParser.ListOfConstContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XQueryParser#listOfConst}.
+	 * @param ctx the parse tree
+	 */
+	void exitListOfConst(XQueryParser.ListOfConstContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code cond_and}
 	 * labeled alternative in {@link XQueryParser#cond}.
