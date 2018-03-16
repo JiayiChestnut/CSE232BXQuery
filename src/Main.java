@@ -20,54 +20,59 @@ public class Main
         XQueryParser parser = new XQueryParser(commonTokenStream);
         XQueryParser.QueryContext qContext = parser.query();
 
-
+        System.out.println("Input:");
         System.out.println(streamIn);
-//        System.out.println(apContext.fileName().getText());
-//        XQueryParser.RpContext rpContext = apContext.rp();
-//        System.out.println(rpContext.getText());
-//        System.out.println(rpContext.getParent().getChildCount());
+        System.out.println("Ouput:");
 
-        MyVisitor visitor = new MyVisitor();
-        List<Node> results = Helper.asListNode(visitor.visit(qContext));
+        QueryRewriter rewriter = new QueryRewriter();
+        System.out.print(rewriter.rewrite(qContext.xq()));
 
-        for (Node node: results)
-            System.out.println(node.getTextContent());
+//      //  System.out.println(apContext.fileName().getText());
+//      //  XQueryParser.RpContext rpContext = apContext.rp();
+//      //  System.out.println(rpContext.getText());
+//      //  System.out.println(rpContext.getParent().getChildCount());
 
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        try {
-            Document doc = dbf.newDocumentBuilder().newDocument();
-            Node root = null;
-            if (results.size() != 1) {
-                root = doc.createElement("result");
-            }
-            for (Node node: results) {
-                Node temp = doc.importNode(node, true);
-                if (results.size() == 1) {
-                    doc.appendChild(temp);
-                } else {
-                    root.appendChild(temp);
-                }
-            }
-            if (results.size() != 1)
-                doc.appendChild(root);
-            TransformerFactory tf = TransformerFactory.newInstance();
-            Transformer trans = tf.newTransformer();
-            trans.setOutputProperty(OutputKeys.INDENT, "yes");
-            trans.setOutputProperty(OutputKeys.METHOD, "xml");
-            trans.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-            trans.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-            trans.transform(new DOMSource(doc), new StreamResult(fileOut));
-            System.out.println("Success.");
-        } catch (ParserConfigurationException e) {
-            System.err.println("Parser Config Exception in Main.");
-            e.printStackTrace();
-        } catch (TransformerConfigurationException e) {
-            System.err.println("Transformer config Exception in Main.");
-            e.printStackTrace();
-        } catch (TransformerException e) {
-            System.err.println("Transformer Exception in Main.");
-            e.printStackTrace();
-        }
+        //MyVisitor visitor = new MyVisitor();
+        //List<Node> results = Helper.asListNode(visitor.visit(qContext));
+
+        //for (Node node: results)
+        //    System.out.println(node.getTextContent());
+
+        //DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        //try {
+        //    Document doc = dbf.newDocumentBuilder().newDocument();
+        //    Node root = null;
+        //    if (results.size() != 1) {
+        //        root = doc.createElement("result");
+        //    }
+        //    for (Node node: results) {
+        //        Node temp = doc.importNode(node, true);
+        //        if (results.size() == 1) {
+        //            doc.appendChild(temp);
+        //        } else {
+        //            root.appendChild(temp);
+        //        }
+        //    }
+        //    if (results.size() != 1)
+        //        doc.appendChild(root);
+        //    TransformerFactory tf = TransformerFactory.newInstance();
+        //    Transformer trans = tf.newTransformer();
+        //    trans.setOutputProperty(OutputKeys.INDENT, "yes");
+        //    trans.setOutputProperty(OutputKeys.METHOD, "xml");
+        //    trans.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        //    trans.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+        //    trans.transform(new DOMSource(doc), new StreamResult(fileOut));
+        //    System.out.println("Success.");
+        //} catch (ParserConfigurationException e) {
+        //    System.err.println("Parser Config Exception in Main.");
+        //    e.printStackTrace();
+        //} catch (TransformerConfigurationException e) {
+        //    System.err.println("Transformer config Exception in Main.");
+        //    e.printStackTrace();
+        //} catch (TransformerException e) {
+        //    System.err.println("Transformer Exception in Main.");
+        //    e.printStackTrace();
+        //}
     }
 
 }
