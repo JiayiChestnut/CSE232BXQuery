@@ -16,8 +16,8 @@ public class QueryRewriter {
     private String lastReturnString = null;
     private final static String RESULT_START = "for $tuple in\n";
     private final static String RETURN = "return";
-    private final static String TUPLE_START = "<tuple>";
-    private final static String TUPLE_END = "</tuple>";
+    private final static String TUPLE_START = "<tuple> {";
+    private final static String TUPLE_END = "} </tuple>";
     private final static String JOIN_START = "join (\n";
 
     private String prevVarPattern = "^(\\$.*?)\\/";
