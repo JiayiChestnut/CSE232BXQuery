@@ -21,20 +21,18 @@ query: xq EOF?;
 
 xq
     : var                                               #xq_var
-    | multiTagClause                                    #xq_makeMultiElement
-    | tagClause                                         #xq_makeElement
+    | '<' tagName '>' '{' xq '}' '<' '/' tagName '>'   #xq_makeElement
     | strConstant                                       #xq_makeText
     | ap                                                #xq_ap
     | '(' xq ')'                                        #xq_xq
-    | xq ',' xq                                         #xq_concat
     | xq '/' rp                                         #xq_nextLevel
     | xq '/' '/' rp                                     #xq_nextLevelRecursive
+    | xq ',' xq                                         #xq_concat
     | forClause letClause? whereClause? returnClause    #xq_loop
     | letClause xq                                      #xq_let
     | joinClause                                        #xq_join
     ;
-multiTagClause: '<' tagName '>' '{'? tagClause+ '}'? '<' '/' tagName '>';
-tagClause: '<' tagName '>' '{' xq '}' '<' '/' tagName '>';
+
 var : '$' IDSTRING;
 strConstant: STRING | PATHSTRING;
 forClause: 'for' var 'in' xq (',' var 'in' xq)*;

@@ -2,6 +2,7 @@ import org.antlr.v4.runtime.tree.*;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -34,7 +35,7 @@ public class MyVisitor extends XQueryBaseVisitor{
         }
         List<Node> res = Helper.asListNode(this.visit(ctx.xq()));
         List<Node> tempRes = new ArrayList<>();
-        Node node = this.doc.createElement(ctx.tagName(0).getText());
+        Node node = this.doc.createElement(tagName);
         for (Node n: res) {
             Node tempNode = this.doc.importNode(n, true);
             node.appendChild(tempNode);
@@ -72,6 +73,11 @@ public class MyVisitor extends XQueryBaseVisitor{
     @Override
     public Object visitXq_var(XQueryParser.Xq_varContext ctx) {
         return this.visit(ctx.var());
+    }
+
+    @Override
+    public Object visitXq_join(XQueryParser.Xq_joinContext ctx) {
+        return this.visit(ctx.joinClause());
     }
 
     @Override
@@ -155,6 +161,86 @@ public class MyVisitor extends XQueryBaseVisitor{
     @Override
     public Object visitReturnClause(XQueryParser.ReturnClauseContext ctx) {
         return this.visit(ctx.xq());
+    }
+
+    @Override
+    public Object visitJoinClause(XQueryParser.JoinClauseContext ctx) {
+        // make a copy of the context nodes
+        List<Node> prevContextNodes = new ArrayList<>();
+        prevContextNodes.addAll(contextNodes);
+        Set<Node> leftTuples = new HashSet<>();
+        leftTuples.addAll(Helper.asListNode(this.visit(ctx.xq(0))));
+        contextNodes = prevContextNodes;
+        Set<Node> rightTuples = new HashSet<>();
+        rightTuples.addAll(Helper.asListNode(this.visit(ctx.xq(1))));
+        List<String> leftAttris = new ArrayList<>();
+        for (TerminalNode idstring : ctx.listOfConst(0).IDSTRING()) {
+            leftAttris.add(idstring.getText());
+        }
+        List<String> rightAttris = new ArrayList<>();
+        for (TerminalNode idstring : ctx.listOfConst(1).IDSTRING()) {
+            rightAttris.add(idstring.getText());
+        }
+
+        Map<KeyWrapper, ArrayList<Node>> hashMap = new HashMap<>();
+        for(Node tuple : leftTuples) {
+            // each tuple
+            NodeList tupleElements = tuple.getChildNodes();
+            KeyWrapper key = new KeyWrapper();
+            // create key with the specified attribute
+            for (int i = 0; i < leftAttris.size(); i++) {
+                String attri = leftAttris.get(i);
+                for (int j = 0; j < tupleElements.getLength(); j++) {
+                    Node curElement = tupleElements.item(j);
+                    if (curElement.getNodeType() == Node.ELEMENT_NODE && curElement.getNodeName().equals(attri)){
+                        key.keyNodes.add(curElement);
+                        break;
+                    }
+                }
+            }
+            if (!hashMap.containsKey(key))
+                hashMap.put(key, new ArrayList<>());
+            hashMap.get(key).add(tuple);
+        }
+
+        List<Node> res = new ArrayList<>();
+        for(Node tuple : rightTuples) {
+            // each tuple
+            NodeList tupleElements = tuple.getChildNodes();
+            KeyWrapper key = new KeyWrapper();
+            // create key with the specified attribute
+            for (int i = 0; i < rightAttris.size(); i++) {
+                String attri = rightAttris.get(i);
+                for (int j = 0; j < tupleElements.getLength(); j++) {
+                    Node curElement = tupleElements.item(j);
+                    if (curElement.getNodeType() == Node.ELEMENT_NODE && curElement.getNodeName().equals(attri)){
+                        key.keyNodes.add(curElement);
+                        break;
+                    }
+                }
+            }
+
+            if (hashMap.containsKey(key)) {
+                for (Node leftTuple : hashMap.get(key)) {
+                    for (int j = 0; j < tupleElements.getLength(); j++) {
+                        Node curElement = tupleElements.item(j);
+                        Node newNode = leftTuple.getOwnerDocument().importNode(curElement, true);
+                        leftTuple.appendChild(newNode);
+                    }
+                    res.add(leftTuple);
+                }
+            }
+
+        }
+
+        contextNodes = res;
+
+        return res;
+    }
+
+    @Override
+    public Object visitListOfConst(XQueryParser.ListOfConstContext ctx) {
+        return null;
     }
 
     // definition: [[Cond1 and Cond2]]C (C) = [[Cond1]]C (C) ∧ [[Cond2]]C (C)

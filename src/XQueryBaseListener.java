@@ -123,18 +123,6 @@ public class XQueryBaseListener implements XQueryListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterXq_makeMultiElement(XQueryParser.Xq_makeMultiElementContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitXq_makeMultiElement(XQueryParser.Xq_makeMultiElementContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterXq_makeText(XQueryParser.Xq_makeTextContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -166,30 +154,6 @@ public class XQueryBaseListener implements XQueryListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitXq_nextLevel(XQueryParser.Xq_nextLevelContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterMultiTagClause(XQueryParser.MultiTagClauseContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitMultiTagClause(XQueryParser.MultiTagClauseContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterTagClause(XQueryParser.TagClauseContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitTagClause(XQueryParser.TagClauseContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
