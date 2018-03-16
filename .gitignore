@@ -9,3 +9,4 @@ src/XQueryParser.java
 # Ignore input and output files
 results.xml
 xquery.txt
+.idea/libraries/antlr_4_7_1_complete.xml
